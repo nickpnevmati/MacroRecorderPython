@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
 		self.app = app
 		self.__createTrayIcon()
 		
-		loadUi('ui/main.ui', self)
+		loadUi('ui/MainWindow.ui', self)
 		self.show()
 
 	def closeEvent(self, event):
