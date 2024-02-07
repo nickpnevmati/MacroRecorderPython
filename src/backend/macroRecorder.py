@@ -15,7 +15,7 @@ class AbstractRecorderCallbackHandler(ABC):
         pass
 
     @abstractclassmethod
-    def handleMouseClick(x: int, y: int, button, asdf: bool) -> (bool | None):
+    def handleMouseClick(x: int, y: int, button) -> (bool | None):
         pass
 
     @abstractclassmethod
