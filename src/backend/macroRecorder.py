@@ -3,11 +3,11 @@ from abc import ABC, abstractclassmethod
 
 class AbstractRecorderCallbackHandler(ABC):
     @abstractclassmethod
-    def handleKeyPress(key, suppress : bool = False) -> None:
+    def handleKeyPress(key) -> None:
         pass
 
     @abstractclassmethod
-    def handleKeyRelease(key, suppress : bool = False) -> None:
+    def handleKeyRelease(key) -> None:
         pass
 
     @abstractclassmethod
