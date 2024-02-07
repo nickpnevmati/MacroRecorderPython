@@ -30,11 +30,14 @@ class MacroRecorder():
     def start(self, mouseListener: bool = True, keyboardListener: bool = True):
         if self.running:
             raise Exception("Recorder is already running, cannot re-instantiate")
+        
         self.__initListeners()
+
         if mouseListener:
             self.mouseListener.start()
         if keyboardListener:
             self.keyboardListener.start()
+            
         self.running = True
     
     def stop(self):
