@@ -7,12 +7,13 @@ from abc import ABCMeta, abstractmethod
 import time
 
 class Action():
-    def __init__(self, runner: Callable, params) -> None:
+    def __init__(self, runner: Callable, *args, **kwargs) -> None:
         self.__runner = runner
-        self.__params = params
+        self.__args = args
+        self.__kwargs = kwargs
 
     def execute(self) -> None:
-        self.__runner(self.__params)
+        self.__runner(*self.__args, **self.__kwargs)
 
 class MacroPlayer():
     def __init__(self, macroFile: TextIOWrapper) -> None:
@@ -52,18 +53,18 @@ class MacroPlayer():
             kwrds = line.split(' ')
             match kwrds[0]:
                 case 'wait':
-                    actions.append(Action(self.__playerSleep, int(kwrds[1]), int(kwrds[2]))) # NOTE kwrds[2] is supposed to be the interval (timestep) maybe change this to be pulled from settings?
+                    actions.append(Action(self.__playerSleep, seconds=int(kwrds[1]), interval=int(kwrds[2]))) # NOTE maybe change this to be pulled from settings?
                 case 'keypress':
-                    actions.append(Action(self.__keyboard.press, kwrds[1]))
+                    actions.append(Action(self.__keyboard.press, key=kwrds[1]))
                 case 'keyrelease':
-                    actions.append(Action(self.__keyboard.release, kwrds[1]))
+                    actions.append(Action(self.__keyboard.release, key=kwrds[1]))
                 case 'mousemove':
-                    actions.append(Action(self.__mouse.move, kwrds[1], kwrds[2]))
+                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
                 case 'mousebutton':
-                    actions.append(Action(self.__mouse.move, kwrds[1], kwrds[2])) # NOTE this may be redundant in some cases, depends on how pynput works...
-                    actions.append(Action(self.__mouse.press, kwrds[3]))
+                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2])) # NOTE this may be redundant in some cases, depends on how pynput works...
+                    actions.append(Action(self.__mouse.press, button=kwrds[3]))
                 case 'mousescroll':
-                    actions.append(Action(self.__mouse.scroll, kwrds[1], kwrds[2], kwrds[3], kwrds[4]))
+                    actions.append(Action(self.__mouse.scroll, dx=kwrds[1], dy=kwrds[2]))
                 case _:
                     pass
 
