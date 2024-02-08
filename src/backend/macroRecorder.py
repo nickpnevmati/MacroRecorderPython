@@ -1,7 +1,7 @@
 from pynput import keyboard, mouse
 from abc import ABC, abstractclassmethod
 
-class AbstractRecorderCallbackHandler(ABC):
+class AbstractMacroEncoder(ABC):
     @abstractclassmethod
     def handleKeyPress(key) -> None:
         pass
@@ -23,7 +23,7 @@ class AbstractRecorderCallbackHandler(ABC):
         pass
 
 class MacroRecorder():
-    def __init__(self, handler: AbstractRecorderCallbackHandler) -> None:
+    def __init__(self, handler: AbstractMacroEncoder) -> None:
         self.handler = handler
         self.running = False
 
