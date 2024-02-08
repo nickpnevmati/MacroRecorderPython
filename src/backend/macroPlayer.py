@@ -31,9 +31,10 @@ class MacroPlayer():
         self.__stopEvent.set()
 
     def __worker(self) -> None:
-        while self.__stopEvent.is_set() and self.__currentAction < len(self.__actions):
+        while not self.__stopEvent.is_set() and self.__currentAction < len(self.__actions):
             self.__updateLoop()
         self.__currentAction = 0
+        self.__stopEvent.clear()
 
     def __updateLoop(self) -> None:
         self.__actions[self.__currentAction].execute()
@@ -60,11 +61,15 @@ class MacroPlayer():
                     actions.append(Action(self.__keyboard.release, key=kwrds[1]))
                 case 'mousemove':
                     actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
-                case 'mousebutton':
-                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2])) # NOTE this may be redundant in some cases, depends on how pynput works...
+                case 'mousepress':
+                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
                     actions.append(Action(self.__mouse.press, button=kwrds[3]))
+                case 'mouserelease':
+                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
+                    actions.append(Action(self.__mouse.release, button=kwrds[3]))
                 case 'mousescroll':
-                    actions.append(Action(self.__mouse.scroll, dx=kwrds[1], dy=kwrds[2]))
+                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
+                    actions.append(Action(self.__mouse.scroll, dx=kwrds[3], dy=kwrds[4]))
                 case _:
                     pass
 

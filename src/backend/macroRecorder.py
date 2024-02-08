@@ -1,4 +1,5 @@
 from pynput import keyboard, mouse
+from pynput.mouse import Button
 from abc import ABC, abstractclassmethod
 
 class AbstractMacroEncoder(ABC):
@@ -15,11 +16,11 @@ class AbstractMacroEncoder(ABC):
         pass
 
     @abstractclassmethod
-    def handleMouseClick(x: int, y: int, button) -> (bool | None):
+    def handleMouseClick(x: int, y: int, button: Button, pressed: bool) -> (bool | None):
         pass
 
     @abstractclassmethod
-    def handleMouseScroll(x: int, y: int, z: int, w: int) -> (bool | None):
+    def handleMouseScroll(x: int, y: int, dx: int, dy: int) -> (bool | None):
         pass
 
 class MacroRecorder():
