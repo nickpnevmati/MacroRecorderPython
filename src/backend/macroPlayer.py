@@ -42,6 +42,8 @@ class MacroPlayer():
         sleeps = seconds * 1000 / interval
         for i in range(sleeps):
             time.sleep(interval)
+            if (self.__stopEvent.is_set()):
+                break
 
     def __parseMacroFile(self, file: TextIOWrapper) -> list[Action]:
         # TODO parse preliminary data (like settings)
@@ -50,7 +52,7 @@ class MacroPlayer():
             kwrds = line.split(' ')
             match kwrds[0]:
                 case 'wait':
-                    actions.append(Action(time.sleep, int(kwrds[1]) * 1000))
+                    actions.append(Action(self.__playerSleep, int(kwrds[1]), int(kwrds[2]))) # NOTE kwrds[2] is supposed to be the interval (timestep) maybe change this to be pulled from settings?
                 case 'keypress':
                     actions.append(Action(self.__keyboard.press, kwrds[1]))
                 case 'keyrelease':
