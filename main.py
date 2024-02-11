@@ -1,6 +1,6 @@
 # from src.MainWindow import MainWindow
-from mainWindow import MainWindow
 from PyQt5.QtWidgets import QApplication
+from src.mainWindow import MainWindow
 import sys
 
 def main():
