@@ -4,10 +4,10 @@ from PyQt5.QtWidgets import (
 	QMessageBox,
 )
 
-from pystray import Icon, MenuItem
+from pystray import Icon, MenuItem, Menu
 from PIL import Image
 from PyQt5.uic import loadUi
-
+from src.TrayIcon import IconThread
 
 class MainWindow(QMainWindow):
 	def __init__(self, app : QApplication):
@@ -27,8 +27,8 @@ class MainWindow(QMainWindow):
 	def __createTrayIcon(self):
 		menu = (MenuItem("Show", self.__TrayShow), MenuItem("Exit", self.__TrayExit))
 		image = Image.open('resources/logo512.png')
-		icon = Icon('Macro Recorder Python', icon=image, menu=menu)
-		icon.run_detached()
+		icon = IconThread('Macro Recorder Python', icon=image, menu=menu)
+		icon.start()
 
 	def __TrayShow(self, icon, item):
 		self.show()
