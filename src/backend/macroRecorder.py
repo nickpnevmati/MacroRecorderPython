@@ -1,26 +1,26 @@
 from pynput import keyboard, mouse
 from pynput.mouse import Button
-from abc import ABC, abstractclassmethod
+from abc import ABC, abstractmethod
 
 class AbstractMacroEncoder(ABC):
-    @abstractclassmethod
-    def handleKeyPress(key) -> None:
+    @abstractmethod
+    def handleKeyPress(self, key) -> None:
         pass
 
-    @abstractclassmethod
-    def handleKeyRelease(key) -> None:
+    @abstractmethod
+    def handleKeyRelease(self, key) -> None:
         pass
 
-    @abstractclassmethod
-    def handleMouseMove(x: int, y: int) -> (bool | None):
+    @abstractmethod
+    def handleMouseMove(self, x: int, y: int) -> (bool | None):
         pass
 
-    @abstractclassmethod
-    def handleMouseClick(x: int, y: int, button: Button, pressed: bool) -> (bool | None):
+    @abstractmethod
+    def handleMouseClick(self, x: int, y: int, button: Button, pressed: bool) -> (bool | None):
         pass
 
-    @abstractclassmethod
-    def handleMouseScroll(x: int, y: int, dx: int, dy: int) -> (bool | None):
+    @abstractmethod
+    def handleMouseScroll(self, x: int, y: int, dx: int, dy: int) -> (bool | None):
         pass
 
 class MacroRecorder():
