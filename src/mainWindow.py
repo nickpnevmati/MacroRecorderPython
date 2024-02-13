@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
 	def __createTrayIcon(self):
 		menu = (MenuItem("Show", self.__TrayShow), MenuItem("Exit", self.__TrayExit))
 		image = Image.open('resources/logo512.png')
-		icon = IconThread('Macro Recorder Python', icon=image, menu=menu)
+		icon = IconThread(name='Macro Recorder Python', icon=image, menu=menu)
 		icon.start()
 
 	def __TrayShow(self, icon, item):

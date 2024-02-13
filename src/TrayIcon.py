@@ -13,6 +13,7 @@ class IconThread(threading.Thread):
         self.stop()
 
     def run(self):
+        print("Running tray")
         self.icon = Icon(*self._icon_args, **self._icon_kwargs)
         self.icon.run()
 
