@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (
 	QApplication,
 	QMainWindow,
 	QMessageBox,
+	QCheckBox
 )
 
 from pystray import Icon, MenuItem, Menu
@@ -16,13 +17,16 @@ class MainWindow(QMainWindow):
 		self.app = app
 		self.__createTrayIcon()
 		
-		loadUi('ui/MainWindow.ui', self)
+		self.win = loadUi('ui/MainWindow.ui', self)
 		self.show()
 
 	def closeEvent(self, event):
-		QMessageBox.information(self, 'App Tray Behavior', 'The app will minimize to the system tray when you close it', QMessageBox.StandardButton.Ok)
-		event.ignore()
-		self.hide()
+		if self.win.findChild(QCheckBox, 'minimizeOrCloseButton').isChecked():
+			event.ignore()
+			self.hide()
+		else:	
+			self.app.quit
+
 
 	def __createTrayIcon(self):
 		menu = (MenuItem("Show", self.__TrayShow), MenuItem("Exit", self.__TrayExit))
