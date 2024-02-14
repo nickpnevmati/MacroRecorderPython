@@ -68,8 +68,7 @@ class MacroPlayer():
                     actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
                     actions.append(Action(self.__mouse.release, button=kwrds[3]))
                 case 'mousescroll':
-                    actions.append(Action(self.__mouse.move, dx=kwrds[1], dy=kwrds[2]))
-                    actions.append(Action(self.__mouse.scroll, dx=kwrds[3], dy=kwrds[4]))
+                    actions.append(Action(self.__mouse.scroll, dx=kwrds[1], dy=kwrds[2]))
                 case _:
                     pass
 
