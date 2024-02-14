@@ -1,0 +1,44 @@
+mousemove 2467 311
+mousemove 2466 312
+mousemove 2464 317
+mousemove 2462 322
+mousemove 2460 328
+mousemove 2457 336
+mousemove 2453 346
+mousemove 2449 358
+mousemove 2445 368
+mousemove 2439 387
+mousemove 2433 401
+mousemove 2426 421
+mousemove 2420 439
+mousemove 2411 462
+mousemove 2404 483
+mousemove 2395 509
+mousemove 2388 531
+mousemove 2380 553
+mousemove 2371 578
+mousemove 2363 601
+mousemove 2353 625
+mousemove 2344 650
+mousemove 2335 671
+mousemove 2328 689
+mousemove 2319 710
+mousemove 2313 724
+mousemove 2306 742
+mousemove 2301 754
+mousemove 2296 767
+mousemove 2292 776
+mousemove 2289 783
+mousemove 2286 791
+mousemove 2284 795
+mousemove 2283 798
+mousemove 2282 801
+mousemove 2281 801
+keypress Key.f1
+keyrelease Key.f1
+keypress Key.f2
+keyrelease Key.f2
+keypress Key.f3
+keyrelease Key.f3
+keypress Key.f4
+keyrelease Key.f4
