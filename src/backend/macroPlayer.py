@@ -1,10 +1,8 @@
 from io import TextIOWrapper
-from typing_extensions import deprecated
 from pynput.mouse import Button, Controller as mouseController
-from pynput.keyboard import Key, KeyCode, Controller as keyboardController
+from pynput.keyboard import KeyCode, Controller as keyboardController
 import threading
 from typing import Callable
-from abc import ABCMeta, abstractmethod
 import time
 
 class Action():
