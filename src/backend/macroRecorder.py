@@ -1,8 +1,8 @@
 from pynput import keyboard, mouse
 from pynput.mouse import Button
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 
-class AbstractMacroEncoder(ABC):
+class AbstractMacroEncoder(ABCMeta):
     @abstractmethod
     def handleKeyPress(self, key) -> None:
         pass
