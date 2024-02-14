@@ -42,7 +42,7 @@ class MacroPlayer():
     
     def __playerSleep(self, seconds: int, interval: int):
         sleeps = seconds * 1000 / interval
-        for i in range(sleeps):
+        for i in range(round(sleeps)):
             time.sleep(interval)
             if (self.__stopEvent.is_set()):
                 break
