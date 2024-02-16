@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.show()
 
     def closeEvent(self, event):
-        if self.window.findChild(QCheckBox, "minimizeOrCloseButton").isChecked():
+        if self.win.findChild(QCheckBox, "minimizeOrCloseButton").isChecked():
             event.ignore()
             self.hide()
         else:
