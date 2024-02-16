@@ -17,13 +17,14 @@ class Action():
         self.__runner(*self.__args, **self.__kwargs)
 
 class MacroPlayer():
-    def __init__(self, macroFile: TextIOWrapper) -> None:
+    def __init__(self, macroFile: TextIOWrapper, onStopEvent: Callable | None) -> None:
         self.__mouse = mouseController()
         self.__keyboard = keyboardController()
         self.__thread = threading.Thread(target=self.__worker)
         self.__stopEvent = threading.Event()
         self.__actions = self.__parseMacroFile(macroFile)
         self.__currentAction = 0
+        self.__onStop = onStopEvent
 
     def start(self) -> None:
         self.__thread.start()
@@ -34,6 +35,8 @@ class MacroPlayer():
 
     def stop(self) -> None:
         self.__stopEvent.set()
+        if self.__onStop is not None:
+            self.__onStop()
 
     def __worker(self) -> None:
         while not self.__stopEvent.is_set() and self.__currentAction < len(self.__actions):
