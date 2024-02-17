@@ -1,6 +1,7 @@
 from pynput import keyboard, mouse
 from pynput.mouse import Button
 from abc import ABCMeta, abstractmethod
+import time
 
 class AbstractMacroEncoder(ABCMeta):
     @abstractmethod
@@ -24,9 +25,11 @@ class AbstractMacroEncoder(ABCMeta):
         pass
 
 class MacroRecorder():
-    def __init__(self, handler: AbstractMacroEncoder) -> None:
-        self.handler = handler
+    def __init__(self) -> None:
         self.running = False
+        self.keyboard = keyboard
+        self.mouse = mouse
+        self.hasReleased=True
 
     def start(self, mouseListener: bool = True, keyboardListener: bool = True):
         if self.running:
@@ -34,22 +37,33 @@ class MacroRecorder():
         
         self.__initListeners()
 
-        if mouseListener:
-            self.mouseListener.start()
+        # if mouseListener:
+        #     self.mouseListener.start()
         if keyboardListener:
             self.keyboardListener.start()
             
         self.running = True
     
     def stop(self):
-        self.mouseListener.stop()
+        # self.mouseListener.stop()
         self.keyboardListener.stop()
         self.running = False
     
     def __initListeners(self):
-        self.mouseListener = mouse.Listener(on_click=self.handler.handleMouseClick, 
-                                            on_move=self.handler.handleMouseMove, 
-                                            on_scroll=self.handler.handleMouseScroll)
+        # self.mouseListener = mouse.Listener(on_click=self.handleMouseClick, 
+        #                                     on_move=self.handleMouseMove, 
+        #                                     on_scroll=self.handleMouseScroll)
         
-        self.keyboardListener = keyboard.Listener(on_press=self.handler.handleKeyPress,
-                                               on_release=self.handler.handleKeyRelease)
+        self.keyboardListener = keyboard.Listener(on_press=self.handleKeyPress,
+                                               on_release=self.handleKeyRelease)
+
+    def handleKeyPress(self, key):
+        if self.hasReleased:
+            self.hasReleased=False
+            print('You pressed the %s key' %key)    
+            self.timer = time.perf_counter()
+
+    def handleKeyRelease(self, key):
+        self.hasReleased = True
+        print(f'You released the {key} key after {(time.perf_counter() - self.timer): .5f} seconds')    
+                                               

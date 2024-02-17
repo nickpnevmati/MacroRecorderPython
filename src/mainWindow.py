@@ -2,13 +2,21 @@ from PyQt5.QtWidgets import (
 	QApplication,
 	QMainWindow,
 	QMessageBox,
-	QCheckBox
+	QCheckBox,
+	QPushButton
 )
 
 from pystray import Icon, MenuItem, Menu
 from PIL import Image
 from PyQt5.uic import loadUi
 from src.TrayIcon import IconThread
+
+
+class MacroRecordingWindow(QMainWindow):
+	def __init__(self):
+		super().__init__()
+		self.win2 = loadUi('ui/MacroRecordingWindow.ui', self)
+
 
 class MainWindow(QMainWindow):
 	def __init__(self, app : QApplication):
@@ -18,6 +26,7 @@ class MainWindow(QMainWindow):
 		self.__createTrayIcon()
 		
 		self.win = loadUi('ui/MainWindow.ui', self)
+		self.win.findChild(QPushButton, 'registerMacroButton').clicked.connect(self.recordMacro)
 		self.show()
 
 	def closeEvent(self, event):
@@ -26,7 +35,10 @@ class MainWindow(QMainWindow):
 			self.hide()
 		else:	
 			self.app.quit
-
+	
+	def recordMacro(self):
+		self.w2 = MacroRecordingWindow()
+		self.w2.show()
 
 	def __createTrayIcon(self):
 		menu = (MenuItem("Show", self.__TrayShow), MenuItem("Exit", self.__TrayExit))

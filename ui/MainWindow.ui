@@ -63,7 +63,7 @@
       <item>
        <widget class="QPushButton" name="registerMacroButton">
         <property name="text">
-         <string> Record macro</string>
+         <string>Record macro</string>
         </property>
        </widget>
       </item>
