@@ -13,6 +13,7 @@ class Window(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.__createTrayIcon()
+        self.ui.minimizeOrCloseButton.clicked.connect(self.toggleTrayOnClose)
         
     def __createTrayIcon(self):
         menu = (MenuItem("Show", self.__TrayShow), MenuItem("Exit", self.__TrayExit))
@@ -25,6 +26,12 @@ class Window(QtWidgets.QMainWindow):
 
     def __TrayExit(self, icon, item):
         self.app.quit()
+        
+    def toggleTrayOnClose(self, clicked: bool):
+        if clicked:
+            pass # TODO
+        else:
+            pass # TODO
 
 def main():
 	app = QApplication(sys.argv)
