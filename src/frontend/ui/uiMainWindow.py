@@ -39,7 +39,7 @@ class Ui_MainWindow(object):
         self.minimizeOrCloseButton.setObjectName("minimizeOrCloseButton")
         self.horizontalLayout.addWidget(self.minimizeOrCloseButton)
         self.hideWhenRecordingCheckbox = QtWidgets.QCheckBox(self.centralwidget)
-        self.hideWhenRecordingCheckbox.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.hideWhenRecordingCheckbox.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.hideWhenRecordingCheckbox.setObjectName("hideWhenRecordingCheckbox")
         self.horizontalLayout.addWidget(self.hideWhenRecordingCheckbox)
         self.registerMacroButton = QtWidgets.QPushButton(self.centralwidget)
