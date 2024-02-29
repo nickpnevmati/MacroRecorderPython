@@ -24,9 +24,9 @@ class SimpleActionListener():
         self.time = time.time_ns()
 
     def start(self, mouseListener: bool = True, keyboardListener: bool = True):
-        if self.ran:
-            raise Exception("Recorder has already ran, cannot re-instantiate")
-        
+        """
+        Initializes Keyboard & Mouse listeners and starts them
+        """
         self.__initListeners()
 
         self.time = time.time_ns()
@@ -38,16 +38,10 @@ class SimpleActionListener():
     
     def stop(self):
         """
-        This calls *stop* on the listeners and joins their threads
-        
-        It is a blocking call
+        This calls *stop* on the listeners
         """
         self.mouseListener.stop()
         self.keyboardListener.stop()
-        # must join to ensure thread have stopped
-        # self.keyboardListener.join()
-        # self.mouseListener.join()
-        self.ran = True
     
     def __initListeners(self):
         self.mouseListener = mouse.Listener(
@@ -62,10 +56,10 @@ class SimpleActionListener():
         )
     
     def __handleKeyPress(self, key) -> None:
-        self.__passActionData(f'keypress {str(key).strip('\'')}')
+        self.__passActionData(f'keypress {str(self.__keyToString(key)).strip('\'')}')
 
     def __handleKeyRelease(self, key) -> None:
-        self.__passActionData(f'keyrelease {str(key).strip('\'')}')
+        self.__passActionData(f'keyrelease {str(self.__keyToString(key)).strip('\'')}')
 
     def __handleMouseMove(self, x: int, y: int) -> (bool | None):
         self.__passActionData(f'mousemove {x} {y}')
@@ -84,3 +78,11 @@ class SimpleActionListener():
         dtime = time.time_ns() - self.time
         self.time = time.time_ns()
         return dtime
+        
+    def __keyToString(self, key) -> str | None:
+        if type(key) is str:
+            return key
+        elif type(key) is keyboard.Key:
+            return key.name
+        elif type(key) is keyboard.KeyCode:
+            return key.char

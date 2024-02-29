@@ -46,7 +46,7 @@ class SimpleMacroPlayer():
                     retList.append((self.__mouseMove, {'position': (int(kwds[1]), int(kwds[2]))}, dtime))
                     retList.append((self.__mouse.release, {'button': Button[kwds[3]]}, 0))
                 case 'mousescroll':
-                    retList.append((self.__mouse.move, {'dx': int(kwds[1]), 'dy': int(kwds[2])}, dtime))
+                    retList.append((self.__mouseMove, {'dx': int(kwds[1]), 'dy': int(kwds[2])}, dtime))
                     retList.append((self.__mouse.scroll, {'dx': int(kwds[3]), 'dy': int(kwds[4])}, 0))
                 case _:
                     raise Exception('Invalid action type')

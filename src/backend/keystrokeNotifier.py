@@ -1,5 +1,6 @@
 from typing import Callable
 import threading
+import pynput
 from pynput.keyboard import Listener 
 
 class KeystrokeNotifier():
@@ -14,6 +15,7 @@ class KeystrokeNotifier():
         
         self.notifyLock = threading.Lock()
         self.notifyLock.acquire(blocking=True)
+        
         self.notify: Callable[[list[str]], None] = notify
         
         self.listener = Listener(on_press=self.__onPress, on_release=self.__onRelease)
@@ -27,18 +29,30 @@ class KeystrokeNotifier():
         self.notifyLock.acquire(blocking=True)
         
     def __onPress(self, key):
-        self.keyLock.acquire(blocking=False)
+        keyVal = self.__keyToString(key)
+        if keyVal is None or not self.keyLock.acquire(blocking=False):
+            return
         
-        if key not in self.keys:            
-            self.keys.append(key)
+        if keyVal not in self.keys:            
+            self.keys.append(keyVal)
             if self.notifyLock.acquire(blocking=False):
                 self.notify(self.keys.copy())
                 self.notifyLock.release()
         self.keyLock.release()
     
     def __onRelease(self, key):
+        keyVal = self.__keyToString(key)
         with self.keyLock:
-            self.keys.remove(key)
+            if keyVal in self.keys:
+                self.keys.remove(keyVal)
+            
+    def __keyToString(self, key) -> str | None:
+        if type(key) is str:
+            return key
+        elif type(key) is pynput.keyboard.Key:
+            return key.name
+        elif type(key) is pynput.keyboard.KeyCode:
+            return key.char
             
 
 # TESTING ONLY
