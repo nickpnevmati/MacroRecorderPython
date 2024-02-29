@@ -27,16 +27,29 @@ class KeystrokeNotifier():
         self.notifyLock.acquire(blocking=True)
         
     def __onPress(self, key):
-        with self.keyLock:
+        self.keyLock.acquire(blocking=False)
+        
+        if key not in self.keys:            
             self.keys.append(key)
-            
-            if not self.notifyLock.acquire(blocking=False):
-                return
-            try:
+            if self.notifyLock.acquire(blocking=False):
                 self.notify(self.keys.copy())
-            finally:
-                    self.notifyLock.release()
+                self.notifyLock.release()
+        self.keyLock.release()
     
     def __onRelease(self, key):
         with self.keyLock:
             self.keys.remove(key)
+            
+
+# TESTING ONLY
+# from time import sleep
+
+# def notify(keys: list[str]):
+#     print(keys)
+            
+# notifier = KeystrokeNotifier(notify)
+# notifier.start()
+
+# sleep(10)
+
+# notifier.stop()
