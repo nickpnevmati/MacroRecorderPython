@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>959</width>
-    <height>625</height>
+    <width>800</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -15,6 +15,12 @@
     <horstretch>1</horstretch>
     <verstretch>1</verstretch>
    </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MacroRecorderPython</string>
@@ -34,39 +40,21 @@
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="widgetResizable">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>939</width>
-         <height>550</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </widget>
+     <layout class="QVBoxLayout" name="macroContainer">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="macrosLabel">
+        <property name="text">
+         <string>MACROS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListView" name="macrosListView"/>
+      </item>
+     </layout>
     </item>
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="startRecordContainer">
       <item>
        <widget class="QPushButton" name="startRecordingButton">
         <property name="text">
@@ -89,6 +77,20 @@
       </item>
      </layout>
     </item>
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="actionsContainer">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="actionsLabel">
+        <property name="text">
+         <string>ACTIONS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListView" name="actionsListView"/>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -96,7 +98,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>959</width>
+     <width>800</width>
      <height>22</height>
     </rect>
    </property>
@@ -109,6 +111,7 @@
     <addaction name="actionLoad_Folder"/>
     <addaction name="separator"/>
     <addaction name="actionRefresh"/>
+    <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -168,6 +171,11 @@
    </property>
    <property name="text">
     <string>Minimize On Record</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
    </property>
   </action>
  </widget>

@@ -35,7 +35,7 @@ class Ui_SettingsWindow(object):
         self.hideWhenClosed.setSizePolicy(sizePolicy)
         self.hideWhenClosed.setMaximumSize(QtCore.QSize(168, 16777215))
         self.hideWhenClosed.setObjectName("hideWhenClosed")
-        self.verticalLayout.addWidget(self.hideWhenClosed, 0, QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.verticalLayout.addWidget(self.hideWhenClosed, 0, QtCore.Qt.AlignLeft)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
