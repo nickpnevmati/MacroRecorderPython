@@ -31,39 +31,46 @@
      <width>1</width>
      <height>1</height>
     </size>
-   </property> 
-   <!-- THIS IS THE PART WE CARE ABOUT SO FAR, IT HAS THE MAIN BUTTONS ON THE MAIN SCREEN-->
+   </property>
    <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="0">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>939</width>
+         <height>550</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QPushButton" name="startRecordingButton">
         <property name="text">
          <string>Start Recording</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class = "QCheckBox" name="minimizeOrCloseButton">
-        <property name="text">
-         <string>Minimize on tray instead of close</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="hideWhenRecordingCheckbox">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="text">
-         <string>Hide Window When Recording</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="registerMacroButton">
-        <property name="text">
-         <string> Record macro</string>
         </property>
        </widget>
       </item>
@@ -81,19 +88,6 @@
        </spacer>
       </item>
      </layout>
-    </item>
-    <item row="1" column="0">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
     </item>
    </layout>
   </widget>
@@ -166,6 +160,14 @@
   <action name="actionPreferences">
    <property name="text">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="actionMiminizeOnRecord">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Minimize On Record</string>
    </property>
   </action>
  </widget>
