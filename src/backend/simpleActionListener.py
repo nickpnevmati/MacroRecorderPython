@@ -21,12 +21,14 @@ class SimpleActionListener():
     def __init__(self, parser: Callable[[Any], Any]) -> None:
         self.parser = parser
         self.ran = False
+        self.callback: Callable | None = None
         self.time = time.time_ns()
 
-    def start(self, mouseListener: bool = True, keyboardListener: bool = True):
+    def start(self, onDoneCallback: Callable | None, mouseListener: bool = True, keyboardListener: bool = True):
         """
         Initializes Keyboard & Mouse listeners and starts them
         """
+        self.callback = onDoneCallback
         self.__initListeners()
 
         self.time = time.time_ns()
@@ -42,6 +44,9 @@ class SimpleActionListener():
         """
         self.mouseListener.stop()
         self.keyboardListener.stop()
+        if self.callback is not None:
+            self.callback()
+        self.callback = None
     
     def __initListeners(self):
         self.mouseListener = mouse.Listener(
