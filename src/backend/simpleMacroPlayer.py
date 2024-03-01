@@ -55,7 +55,7 @@ class SimpleMacroPlayer():
     def __mouseMove(self, position: tuple[int, int]):
         self.__mouse.position = position
     
-    def play(self):
+    def play(self, onCompleteCallback: Callable):
         for action in self.__actions:
             function = action[0]
             kwargs = action[1]
@@ -67,3 +67,5 @@ class SimpleMacroPlayer():
             # TODO check this and maybe the cancellation goes here
             
             function(**kwargs)
+            
+        onCompleteCallback()

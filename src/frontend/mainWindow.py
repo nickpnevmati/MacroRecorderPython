@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets
-from backend.macroManager import MacroManager
-from src.frontend.trayIcon import IconThread
+from src.backend.macroManager import MacroManager
 from src.frontend.ui.uimainwindow import Ui_MainWindow
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -9,11 +8,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         
-        self.macroManager = MacroManager()
-        
         self.ui.startRecordingButton.clicked.connect(self.OnStartRecordingClicked)
+        self.macroManager = MacroManager()
         
     def OnStartRecordingClicked(self):
         # TODO start recording
-        # self.hide()
-        pass
+        self.hide()
+        self.macroManager.startRecording(self.show)
