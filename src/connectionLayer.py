@@ -4,6 +4,13 @@ from src.backend.macroManager import MacroManager
 from src.frontend.mainWindow import MainWindow
 
 class ConnectionLayer():
+    """
+    This class acts like an intermediate layer (hence the name) between the UI madness,
+    the multithreading macro recording/playback madness and any other module that adds the overall
+    madness. 
+    
+    I'm not even sure why I undertook this project at this point to be honest....
+    """
     def __init__(self, window: MainWindow) -> None:
         self.manager = MacroManager()
         self.window = window
