@@ -1,36 +1,43 @@
 from logging import Manager
-from backend.simpleActionListener import SimpleActionListener
-from backend.simpleMacroPlayer import SimpleMacroPlayer
+from src.backend.simpleActionListener import SimpleActionListener
+from src.backend.simpleMacroPlayer import SimpleMacroPlayer
 from src.backend.keystrokeNotifier import KeystrokeNotifier
 from typing import Callable, final
 from enum import Enum, auto
 from threading import Lock
 
-class __ManagerState(Enum):
+class _ManagerState(Enum):
     RECORDING = auto()
     PLAYING = auto()
     REFRESH = auto() # REDUNDANT FOR THE MOMENT 
     IDLE = auto()
     
 class MacroManager():
-    def __init__(self) -> None:        
+    def __init__(self) -> None:
         self.__keystrokenotifier = KeystrokeNotifier(self.__keyStrokeCallback)
-        self.__keystrokenotifier.start()
         
         self.__recorder = SimpleActionListener(self.__actionParser)
         self.__actionsRecorded = []
         
         self.__macros = {}
         
-        self.__state = __ManagerState.IDLE
+        self.__state = _ManagerState.IDLE
         
         self.__lock = Lock()
+        
+        self.__keystrokenotifier.start()
                 
     def startRecording(self, onRecordingFinishedCallback: Callable) -> None:
         if self.__lock.acquire(blocking=False):
-            self.__setState(__ManagerState.RECORDING)
+            self.__setState(_ManagerState.RECORDING)
+            
             self.__actionsRecorded.clear()
-            self.__recorder.start(lambda: (self.__lock.release(), self.__setState(__ManagerState.IDLE)))
+            
+            self.__recorder.start(lambda: (
+                self.__lock.release(), 
+                self.__setState(_ManagerState.IDLE), 
+                onRecordingFinishedCallback(),
+                ))
     
     def stopRecording(self) -> None:
         self.__recorder.stop()
@@ -45,13 +52,16 @@ class MacroManager():
     
     def startPlaying(self, macro: SimpleMacroPlayer):
         if self.__lock.acquire(blocking=False):
-            self.__state = __ManagerState.PLAYING
-            macro.play(lambda: (self.__lock.release, self.__setState(__ManagerState.IDLE)))
+            self.__state = _ManagerState.PLAYING
+            macro.play(lambda: (self.__lock.release, self.__setState(_ManagerState.IDLE)))
+            
+    def getActions(self) -> dict:
+        return { 'actions' : self.__actionsRecorded.copy() }
         
     def __keyStrokeCallback(self, pressedKeys: list[str]):
         pressedString = ''.join(pressedKeys)
         match self.__state:
-            case __ManagerState.IDLE:
+            case _ManagerState.IDLE:
                 if not pressedString in self.__macros:
                     return
                 
@@ -59,15 +69,17 @@ class MacroManager():
                 
                 ## TODO what about start recording via shortcut?
                 
-            case __ManagerState.PLAYING:
+            case _ManagerState.PLAYING:
                 pass # TODO maybe cancel?
-            case __ManagerState.RECORDING:
-                pass # TODO check for "stop" keystroke
+            case _ManagerState.RECORDING:
+                if pressedString == "ctrlb":
+                    self.__recorder.stop()
+                    # TODO
             case _:
                 pass
     
     def __actionParser(self, action: str):
         self.__actionsRecorded.append(action)
         
-    def __setState(self, state: __ManagerState):
+    def __setState(self, state: _ManagerState):
         self.__state = state

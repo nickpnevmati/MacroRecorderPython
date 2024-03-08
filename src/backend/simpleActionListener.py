@@ -21,7 +21,7 @@ class SimpleActionListener():
     def __init__(self, parser: Callable[[Any], Any]) -> None:
         self.parser = parser
         self.ran = False
-        self.callback: Callable | None = None
+        self.callback: Callable | None = parser
         self.time = time.time_ns()
 
     def start(self, onDoneCallback: Callable | None, mouseListener: bool = True, keyboardListener: bool = True):
@@ -61,10 +61,12 @@ class SimpleActionListener():
         )
     
     def __handleKeyPress(self, key) -> None:
-        self.__passActionData(f'keypress {str(self.__keyToString(key)).strip('\'')}')
+        aylmao = str(self.__keyToString(key)).strip("\'")
+        self.__passActionData(f'keypress {aylmao}')
 
     def __handleKeyRelease(self, key) -> None:
-        self.__passActionData(f'keyrelease {str(self.__keyToString(key)).strip('\'')}')
+        aylmao = str(self.__keyToString(key)).strip("\'")
+        self.__passActionData(f'keyrelease {aylmao}')
 
     def __handleMouseMove(self, x: int, y: int) -> (bool | None):
         self.__passActionData(f'mousemove {x} {y}')
