@@ -1,5 +1,5 @@
 import json
-from src import user_data_dir
+import src
 from src.backend.macroManager import MacroManager
 from src.frontend.mainWindow import MainWindow
 
@@ -33,12 +33,12 @@ class ConnectionLayer():
         self.__writeMacroFile('tmp.macro', actions)
             
     def __writeMacroFile(self, filename: str, data):
-        path = user_data_dir() / ('macros' + filename)
+        path = src.app_data_path / ('macros' + filename)
         with open(path, 'w') as fp:
             json.dump(data, fp)
             
     def __editPreferece(self, key, value):
-        path = user_data_dir() / 'prefs'
+        path = src.app_data_path / 'prefs'
         with open(path, 'rw') as prefsFile:
             prefs = json.load(prefsFile)
             prefs[key] = value

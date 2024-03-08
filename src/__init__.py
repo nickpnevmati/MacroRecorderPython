@@ -6,7 +6,7 @@ from pathlib import Path
 # yoinked & modified from https://github.com/SwagLyrics/SwagLyrics-For-Spotify/blob/master/swaglyrics/__init__.py#L8-L32
 # create unsupported.txt in os specific user directory
 # doc: https://github.com/ActiveState/appdirs/blob/master/appdirs.py#L44 derivative
-def user_data_dir() -> Path:
+def __user_data_dir() -> Path:
     r"""
     Get OS specific data directory path for SwagLyrics.
 
@@ -41,4 +41,4 @@ def __create_dir(path: Path):
     if not Path.exists(path):
         Path.mkdir(path)
         
-user_data_dir()
+app_data_path = __user_data_dir()
