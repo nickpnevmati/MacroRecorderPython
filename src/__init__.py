@@ -32,7 +32,8 @@ def user_data_dir() -> Path:
     
     __create_dir(path)
     __create_dir(path / 'macros')
-    __create_dir(path / 'prefs')
+    if not Path.exists(path / 'prefs.json'):
+        Path.touch(path / 'prefs.json')
         
     return path
 

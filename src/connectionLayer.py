@@ -23,9 +23,16 @@ class ConnectionLayer():
     def __onStopRecording(self):
         self.window.show()
         actions = self.manager.getActions()
-        self.__writeToFile('macros/tmp.macro', actions)
-        
-    def __writeToFile(self, filename: str, data):
-        path = user_data_dir() / filename
-        fp = open(path, 'w')
-        json.dump(data, fp)
+        self.__writeMacroFile('tmp.macro', actions)
+            
+    def __writeMacroFile(self, filename: str, data):
+        path = user_data_dir() / ('macros' + filename)
+        with open(path, 'w') as fp:
+            json.dump(data, fp)
+            
+    def __editPreferece(self, key, value):
+        path = user_data_dir() / 'prefs'
+        with open(path, 'rw') as prefsFile:
+            prefs = json.load(prefsFile)
+            prefs[key] = value
+            json.dump(prefs, prefsFile)
