@@ -15,12 +15,21 @@ class _ManagerState(Enum):
 class RecorderSettings():    
     def __init__(self, captureMouseMovement: bool = True) -> None:
         self.captureMouseMovement = captureMouseMovement
+        
+    def applies(self, action:str) -> bool:
+        """
+        Does the action conform to the preferences?
+        """
+        if self.captureMouseMovement and action.__contains__('mousemove'):
+            return False
+        return True
     
 class MacroManager():
     def __init__(self) -> None:
         self.__keystrokenotifier = KeystrokeNotifier(self.__keyStrokeCallback)
         
         self.__recorder = SimpleActionListener(self.__actionParser)
+        self.__preferences: RecorderSettings = RecorderSettings()
         self.__actionsRecorded = []
         
         self.__macros = {}
@@ -31,7 +40,9 @@ class MacroManager():
         
         self.__keystrokenotifier.start()
                 
-    def startRecording(self, onRecordingFinishedCallback: Callable, settings: RecorderSettings = RecorderSettings()) -> None:
+    def startRecording(self, onRecordingFinishedCallback: Callable, prefs: RecorderSettings = RecorderSettings()) -> None:
+        self.__preferences = prefs
+        
         if self.__lock.acquire(blocking=False):
             self.__setState(_ManagerState.RECORDING)
             
@@ -83,7 +94,9 @@ class MacroManager():
                 pass
     
     def __actionParser(self, action: str):
-        self.__actionsRecorded.append(action)
+        if self.__preferences.applies(action):
+            self.__actionsRecorded.append(action)
+            
         
     def __setState(self, state: _ManagerState):
         self.__state = state
