@@ -12,6 +12,10 @@ class _ManagerState(Enum):
     REFRESH = auto() # REDUNDANT FOR THE MOMENT 
     IDLE = auto()
     
+class RecorderSettings():    
+    def __init__(self, captureMouseMovement: bool = True) -> None:
+        self.captureMouseMovement = captureMouseMovement
+    
 class MacroManager():
     def __init__(self) -> None:
         self.__keystrokenotifier = KeystrokeNotifier(self.__keyStrokeCallback)
@@ -27,7 +31,7 @@ class MacroManager():
         
         self.__keystrokenotifier.start()
                 
-    def startRecording(self, onRecordingFinishedCallback: Callable) -> None:
+    def startRecording(self, onRecordingFinishedCallback: Callable, settings: RecorderSettings = RecorderSettings()) -> None:
         if self.__lock.acquire(blocking=False):
             self.__setState(_ManagerState.RECORDING)
             

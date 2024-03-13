@@ -25,7 +25,7 @@ class ConnectionLayer():
         
     def __onStartRecording(self):
         self.window.hide()
-        self.manager.startRecording(self.__onStopRecording)
+        self.manager.startRecording(self.__onStopRecording) # TODO call to UI layer for preferences
         
     def __onStopRecording(self):
         self.window.show()
