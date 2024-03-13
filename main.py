@@ -17,7 +17,7 @@ def ensureSingleInstance():
     if Path.exists(lockFile):
         exit(1)
     Path.touch(lockFile)
-    atexit.register(lambda : os.remove(lockFile))
+    atexit.register(func=lambda : os.remove(lockFile))
 
 def main():
     faulthandler.enable()
