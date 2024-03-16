@@ -35,7 +35,7 @@ class ConnectionLayer():
         self.__writeMacroFile('tmp.macro', actions)
             
     def __writeMacroFile(self, filename: str, data):
-        path = src.app_data_path / ('macros' + filename)
+        path = src.app_data_path / 'macros' / filename
         with open(path, 'w') as fp:
             json.dump(data, fp)
             
