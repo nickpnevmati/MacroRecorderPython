@@ -1,6 +1,6 @@
 import json
 import src
-from src.backend.macroManager import MacroManager
+from src.backend.macroManager import MacroManager, RecorderSettings
 from src.frontend.mainWindow import MainWindow
 
 class ConnectionLayer():
@@ -13,6 +13,7 @@ class ConnectionLayer():
     """
     def __init__(self, window: MainWindow) -> None:
         self.manager = MacroManager()
+        self.recorderPrefs : RecorderSettings = RecorderSettings()
         self.window = window
         
         self.__setup()
@@ -22,10 +23,11 @@ class ConnectionLayer():
         This is where the UI layer is connected to the connlayer
         """
         self.window.ui.startRecordingButton.clicked.connect(self.__onStartRecording)
+        self.window.ui.captureMouseToggle.toggled.connect(lambda value : self.recorderPrefs.setCaptureMouse(value))
         
     def __onStartRecording(self):
         self.window.hide()
-        self.manager.startRecording(self.__onStopRecording) # TODO call to UI layer for preferences
+        self.manager.startRecording(self.__onStopRecording, self.recorderPrefs)
         
     def __onStopRecording(self):
         self.window.show()

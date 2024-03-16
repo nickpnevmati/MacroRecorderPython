@@ -16,11 +16,14 @@ class RecorderSettings():
     def __init__(self, captureMouseMovement: bool = True) -> None:
         self.captureMouseMovement = captureMouseMovement
         
+    def setCaptureMouse(self, value: bool) -> None:
+        self.captureMouseMovement = value
+        
     def applies(self, action:str) -> bool:
         """
         Does the action conform to the preferences?
         """
-        if self.captureMouseMovement and action.__contains__('mousemove'):
+        if not self.captureMouseMovement and action.__contains__('mousemove'):
             return False
         return True
     

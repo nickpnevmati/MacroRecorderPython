@@ -13,11 +13,11 @@ def ensureSingleInstance():
     """
     Ensured the existance of only one instance of the app using a file as a "lock"
     """
+    atexit.register(lambda : os.remove(lockFile))
     lockFile = src.app_data_path / '~instance.lock'
     if Path.exists(lockFile):
         exit(1)
     Path.touch(lockFile)
-    atexit.register(func=lambda : os.remove(lockFile))
 
 def main():
     faulthandler.enable()
