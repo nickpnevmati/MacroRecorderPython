@@ -23,7 +23,6 @@ def main():
     faulthandler.enable()
     ensureSingleInstance()
     app = QApplication(sys.argv)
-    app.setQuitOnLastWindowClosed(False)
     win = MainWindow()
     tray = TrayIcon(app, win) # Must keep references here otherwise they gets garbage collected :) kill me
     connectionLayer = ConnectionLayer(win)

@@ -53,7 +53,21 @@
       </item>
      </layout>
     </item>
-    <item row="0" column="0">
+    <item row="1" column="1">
+     <layout class="QVBoxLayout" name="actionsContainer">
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QLabel" name="actionsLabel">
+        <property name="text">
+         <string>ACTIONS</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListView" name="actionsListView"/>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0" colspan="2">
      <layout class="QHBoxLayout" name="startRecordContainer">
       <item>
        <widget class="QPushButton" name="startRecordingButton">
@@ -82,19 +96,12 @@
         </property>
        </spacer>
       </item>
-     </layout>
-    </item>
-    <item row="1" column="1">
-     <layout class="QVBoxLayout" name="actionsContainer">
-      <item alignment="Qt::AlignHCenter">
-       <widget class="QLabel" name="actionsLabel">
+      <item>
+       <widget class="QCheckBox" name="minimizeOnCloseToggle">
         <property name="text">
-         <string>ACTIONS</string>
+         <string>Minimize on close</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <widget class="QListView" name="actionsListView"/>
       </item>
      </layout>
     </item>

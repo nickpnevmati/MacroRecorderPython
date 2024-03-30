@@ -2,6 +2,7 @@ import json
 import src
 from src.backend.macroManager import MacroManager, RecorderSettings
 from src.frontend.mainWindow import MainWindow
+from PyQt5 import QtWidgets
 
 class ConnectionLayer():
     """
@@ -24,7 +25,7 @@ class ConnectionLayer():
         """
         self.window.ui.startRecordingButton.clicked.connect(self.__onStartRecording)
         self.window.ui.captureMouseToggle.toggled.connect(lambda value : self.recorderPrefs.setCaptureMouse(value))
-        
+    
     def __onStartRecording(self):
         self.window.hide()
         self.manager.startRecording(self.__onStopRecording, self.recorderPrefs)
@@ -33,6 +34,8 @@ class ConnectionLayer():
         self.window.show()
         actions = self.manager.getActions()
         self.__writeMacroFile('tmp.macro', actions)
+    
+    
             
     def __writeMacroFile(self, filename: str, data):
         path = src.app_data_path / 'macros' / filename
