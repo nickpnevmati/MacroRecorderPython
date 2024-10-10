@@ -3,21 +3,21 @@ import time
 from pynput import keyboard, mouse
 from pynput.mouse import Button
 
-class MacroRecorder():
-    def __init__(self, filePointer: TextIOWrapper) -> None:
-        self.file = filePointer
+class MacroRecorder:
+    def __init__(self, file_pointer: TextIOWrapper) -> None:
+        self.file = file_pointer
         self.running = False
         self.time = time.time_ns()
 
-    def start(self, mouseListener: bool = True, keyboardListener: bool = True):
+    def start(self, mouse_listener: bool = True, keyboard_listener: bool = True):
         if self.running:
             raise Exception("Recorder is already running, cannot re-instantiate")
         
-        self.__initListeners()
+        self.__init_listeners()
 
-        if mouseListener:
+        if mouse_listener:
             self.mouseListener.start()
-        if keyboardListener:
+        if keyboard_listener:
             self.keyboardListener.start()
             
         self.running = True
@@ -30,34 +30,34 @@ class MacroRecorder():
         self.mouseListener.join()
         self.running = False
     
-    def __initListeners(self):
-        self.mouseListener = mouse.Listener(on_click=self.__handleMouseClick, 
-                                            on_move=self.__handleMouseMove, 
-                                            on_scroll=self.__handleMouseScroll)
+    def __init_listeners(self):
+        self.mouseListener = mouse.Listener(on_click=self.__handle_mouse_click,
+                                            on_move=self.__handle_mouse_move,
+                                            on_scroll=self.__handle_mouse_scroll)
         
-        self.keyboardListener = keyboard.Listener(on_press=self.__handleKeyPress,
-                                               on_release=self.__handleKeyRelease)
+        self.keyboardListener = keyboard.Listener(on_press=self.__handle_key_press,
+                                                  on_release=self.__handle_key_release)
     
-    def __handleKeyPress(self, key) -> None:
-        self.__writeFile(f'keypress {key}')
+    def __handle_key_press(self, key) -> None:
+        self.__write_file(f'keypress {key}')
 
-    def __handleKeyRelease(self, key) -> None:
-        self.__writeFile(f'keypress {key}')
+    def __handle_key_release(self, key) -> None:
+        self.__write_file(f'keypress {key}')
 
-    def __handleMouseMove(self, x: int, y: int) -> (bool | None):
-        self.__writeFile(f'mousemove {x} {y}')
+    def __handle_mouse_move(self, x: int, y: int) -> (bool | None):
+        self.__write_file(f'mousemove {x} {y}')
 
-    def __handleMouseClick(self, x: int, y: int, button: Button, pressed: bool) -> (bool | None):
+    def __handle_mouse_click(self, x: int, y: int, button: Button, pressed: bool) -> (bool | None):
         action = 'mouseclick' if pressed else 'mouserelease'
-        self.__writeFile(f'{action} {x} {y} {button}')
+        self.__write_file(f'{action} {x} {y} {button}')
 
-    def __handleMouseScroll(self, x: int, y: int, dx: int, dy: int) -> (bool | None):
-        self.__writeFile(f'mousescroll {x} {y} {dx} {dy}')
+    def __handle_mouse_scroll(self, x: int, y: int, dx: int, dy: int) -> (bool | None):
+        self.__write_file(f'mousescroll {x} {y} {dx} {dy}')
     
-    def __writeFile(self, data:str) -> None:
-        self.file.write(f'{data} {self.__nsSinceLastAction()}\n')
+    def __write_file(self, data:str) -> None:
+        self.file.write(f'{data} {self.__ns_since_last_action()}\n')
         
-    def __nsSinceLastAction(self) -> int:
+    def __ns_since_last_action(self) -> int:
         dtime = time.time_ns() - self.time
         self.time = time.time_ns()
         return dtime

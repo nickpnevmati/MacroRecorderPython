@@ -1,12 +1,11 @@
 pillow==10.2.0
-PyQt5==5.15.10
+PyQt5==5.15.9
 PyQt5-Qt5==5.15.2
 PyQt5-sip==12.13.0
-PyQt6==6.6.1
-PyQt6-Qt6==6.6.1
-PyQt6-sip==13.6.0
 pystray==0.19.5
 python-xlib==0.33
-setuptools==68.2.2
+setuptools==70.0.0
 six==1.16.0
 wheel==0.41.2
+pynput~=1.7.7
+appdirs~=1.4.4
