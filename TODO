@@ -1,0 +1,4 @@
+- Connect the playback and recording logic to the frontend
+    - welp, recorders are now separate threads....kill me
+- get a better logo - done (poggers)
+- Factory for the actual macros UI -_-

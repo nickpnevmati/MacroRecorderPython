@@ -11,8 +11,8 @@ def main():
     app = QApplication(sys.argv)
     w = MainWindow(app)
 
-    trayIcon = SystemTrayIcon(QIcon("resources/logo512.png"), w)
-    trayIcon.show()
+    tray_icon = SystemTrayIcon(QIcon("resources/logo512.png"), w)
+    tray_icon.show()
 
     sys.exit(app.exec())
 
