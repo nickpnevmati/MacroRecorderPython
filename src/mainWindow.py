@@ -1,23 +1,17 @@
-import io
-from optparse import Option
 from typing import Callable
-
-from PyQt5.QtCore import QSettings, pyqtSignal, QEvent
-from PyQt5.QtGui import QKeyEvent
+from PyQt5.QtCore import QSettings, pyqtSignal
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
-    QCheckBox, QAction, QPushButton, QVBoxLayout, QLayout, QWidget, QLineEdit, QHBoxLayout, QSizePolicy, QScrollArea
+    QCheckBox, QAction, QPushButton, QLayout, QWidget, QLineEdit, QSizePolicy, QScrollArea
 )
 from PyQt5.uic import loadUi
-import os
-from appdirs import user_data_dir
 from pynput.keyboard import HotKey
 from src import ShortcutWidget
 from src.ShortcutWidget import KeySequenceWidget
 from src.backend.KeyCodeSerializer import serialize_keys, deserialize_keys
 from src.backend.ShortcutListener import ShortcutListener
-from src.backend.macroRecorder import MacroRecorder
+from src.backend.macroManager import MacroManager
 from src.logger import logger
 
 
@@ -83,6 +77,8 @@ class MainWindow(QMainWindow):
         self.ui_construct_signal.connect(self.create_macro_item_ui) # This UI framework is great but I hate it
         self.ui_construct_signal.connect(self.create_macro_actions_ui)
 
+        self.macro_manager = MacroManager(lambda : self.start_recording_button.setEnabled(True))
+
         #endregion
 
         if self.settings.value("minimizeOnStartup", False) == "true":
@@ -93,10 +89,14 @@ class MainWindow(QMainWindow):
     #region Callbacks & Triggers
 
     def start_recording_trigger(self):
+        if self.macro_manager.is_recording:
+            logger.warning('Start recording button pushed while recording')
+            return
         self.start_recording_button.setEnabled(False)
         self.macro_hotkey_listener.set_enabled(False)
         if self.settings.value('hideWhenRecording', "true") == "true":
             self.hide()
+        self.macro_manager.start_recording()
 
     def stop_recording_shortcut_changed(self, keys: list | None):
         serialized_keys = serialize_keys(keys) if keys else 'None'
@@ -118,9 +118,11 @@ class MainWindow(QMainWindow):
     #endregion
 
     def stop_recording(self):
-        self.start_recording_button.setEnabled(True)
+        if not self.macro_manager.is_recording:
+            return
         self.macro_hotkey_listener.set_enabled(True)
         self.ui_construct_signal.emit()
+        self.macro_manager.stop_recording()
         logger.info('Stopped recording')
 
     def create_macro_item_ui(self):
@@ -130,7 +132,7 @@ class MainWindow(QMainWindow):
         save_button = item_widget.findChild(QPushButton, 'SaveButton')
         hotkey_field : QWidget = item_widget.findChild(QWidget, 'MacroHotkey')
 
-        create_hotkey_widget(lambda k: print('aylmao'), None, hotkey_field.layout())
+        create_hotkey_widget(lambda k: print('aylmao'), None, hotkey_field.layout()) # TODO
         self.macro_items_container.layout().addWidget(item_widget)
         self.scroll_area_item.setMinimumWidth(item_widget.minimumWidth())
         logger.info("Added MacroItem")

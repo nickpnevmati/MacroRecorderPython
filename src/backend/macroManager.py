@@ -1,23 +1,27 @@
-import io
-from typing import Callable
+import threading
 from PyQt5.QtCore import pyqtSignal
 from appdirs import user_data_dir
 import os
-from src.backend.macroPlayer import MacroPlayer
 from src.backend.macroRecorder import MacroRecorder
 
 class MacroManager:
-    def __init__(self) -> None:
+
+    def __init__(self, recorder_stopped_callback) -> None:
         self.__macroFilePath: str = user_data_dir('MacroRecorderPython')
         os.makedirs(self.__macroFilePath, exist_ok=True)
 
-        self.__stop_recording_callback = None
-        self.__macroRecorder = MacroRecorder()
+        self.on_recorder_stop = recorder_stopped_callback
 
-    def start_recording(self, on_stop_callback: Callable[[io.StringIO], None]):
-        self.on_recording_stopped.connect(on_stop_callback)
-        self.__macroRecorder.start()
+        self.__lock = threading.Lock()
+        self.__recorder = None
+        self.is_recording = False
+
+    def start_recording(self):
+        self.is_recording = True
+        self.__recorder = MacroRecorder(self.__lock, lambda : (self.on_recorder_stop(),
+                                                               setattr(self, 'is_recording', False)))
 
     def stop_recording(self):
-        self.__macroRecorder.stop()
+        data = self.__recorder.recorder_stop()
+        # TODO
 
