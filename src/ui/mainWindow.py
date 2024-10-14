@@ -6,45 +6,22 @@ from PyQt5.QtWidgets import (
     QCheckBox, QAction, QPushButton, QLayout, QWidget, QLineEdit, QSizePolicy, QScrollArea
 )
 from PyQt5.uic import loadUi
-from pynput.keyboard import HotKey
-from src import ShortcutWidget
-from src.ShortcutWidget import KeySequenceWidget
+from src.ui import HotkeyWidget
+from src.ui.HotkeyWidget import HotkeyWidget
 from src.backend.KeyCodeSerializer import serialize_keys, deserialize_keys
-from src.backend.ShortcutListener import ShortcutListener
 from src.backend.macroManager import MacroManager
 from src.logger import logger
 
-
-def create_hotkey_widget(on_changed: Callable[[list | None], None], preload: list | None, parent: QLayout) -> ShortcutWidget:
-    widget = KeySequenceWidget()
-    widget.connect_shortcut_changed_callback(on_changed)
-    widget.set_sequence(preload)
-    widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-    parent.addWidget(widget)
-    return widget
-
 class MainWindow(QMainWindow):
 
-    ui_construct_signal = pyqtSignal()
+    ui_construct_signal = pyqtSignal(object)
 
     def __init__(self, app : QApplication):
         super().__init__()
         self.app = app
         self.win = loadUi('ui/MainWindow.ui', self)
 
-        self.ui_prefabs = {
-            "macroItem": 'ui/MacroItem.ui',
-            'macroActions' : 'ui/MacroAction.ui'
-        }
-
-        self.macro_hotkey_listener = ShortcutListener()
-        self.misc_hotkey_listener = ShortcutListener()
         self.settings = QSettings("MacroRecorderPython", "settings")
-
-        stop_recording_keys = self.settings.value('stopRecordingHotkey', 'None')
-        keys_deserialized = deserialize_keys(stop_recording_keys) if stop_recording_keys != 'None' else None
-        self.stop_recording_hotkey = HotKey(keys_deserialized, self.stop_recording) if keys_deserialized else None
-        self.misc_hotkey_listener.register_hotkey(self.stop_recording_hotkey)
 
         self.macro_items_container: QWidget = self.win.findChild(QWidget, 'macroItemsContainer')
         self.macro_actions_container: QWidget = self.win.findChild(QWidget, 'macroActionsContainer')
@@ -53,8 +30,11 @@ class MainWindow(QMainWindow):
 
         #region Initialize Widgets & Signals
 
-        key_seq_widget = create_hotkey_widget(self.stop_recording_shortcut_changed, keys_deserialized,
-                                              self.win.findChild(QWidget, "stopShortcutContainer").layout())
+        key_seq_widget = HotkeyWidget(
+            self.stop_recording_hotkey_changed,
+            self.settings.value('stopRecordingHotkey', '[]'),
+            self.win.findChild(QWidget, "stopShortcutContainer").layout()
+        )
 
         clear_button: QPushButton = self.win.findChild(QPushButton, "clearShortcutButton")
         clear_button.clicked.connect(key_seq_widget.clear_sequence)
@@ -75,11 +55,10 @@ class MainWindow(QMainWindow):
         self.start_recording_button.clicked.connect(self.start_recording_trigger)
 
         self.ui_construct_signal.connect(self.create_macro_item_ui) # This UI framework is great but I hate it
-        self.ui_construct_signal.connect(self.create_macro_actions_ui)
-
-        self.macro_manager = MacroManager(lambda : self.start_recording_button.setEnabled(True))
 
         #endregion
+
+        self.macro_manager = MacroManager(self.settings.value('stopRecordingHotkey', '[]'), self.__stopped_recording_callback)
 
         if self.settings.value("minimizeOnStartup", False) == "true":
             self.hide()
@@ -89,21 +68,13 @@ class MainWindow(QMainWindow):
     #region Callbacks & Triggers
 
     def start_recording_trigger(self):
-        if self.macro_manager.is_recording:
-            logger.warning('Start recording button pushed while recording')
-            return
         self.start_recording_button.setEnabled(False)
-        self.macro_hotkey_listener.set_enabled(False)
         if self.settings.value('hideWhenRecording', "true") == "true":
             self.hide()
         self.macro_manager.start_recording()
 
-    def stop_recording_shortcut_changed(self, keys: list | None):
-        serialized_keys = serialize_keys(keys) if keys else 'None'
-        self.settings.setValue("stopRecordingHotkey", serialized_keys)
-        new_hotkey = HotKey(keys, self.stop_recording) if keys else None
-        self.misc_hotkey_listener.update_hotkey(self.stop_recording_hotkey, new_hotkey)
-        self.stop_recording_hotkey = new_hotkey
+    def stop_recording_hotkey_changed(self, keys: list | None):
+        self.settings.setValue("stopRecordingHotkey", serialize_keys(keys))
 
     def hide_to_tray_when_closing_changed(self, check_state):
         self.settings.setValue("minimizeWhenClose", "true" if check_state else "false")
@@ -117,28 +88,73 @@ class MainWindow(QMainWindow):
 
     #endregion
 
-    def stop_recording(self):
-        if not self.macro_manager.is_recording:
+    def __stopped_recording_callback(self, macro: dict):
+        self.ui_construct_signal.emit(macro)
+        self.start_recording_button.setEnabled(True)
+        if self.settings.value('hideWhenRecording', "true") == 'true':
+            self.show()
+
+    def create_macro_item_ui(self, macro: object):
+        if not isinstance(macro, dict):
+            logger.error("Macro object is not a dict")
             return
-        self.macro_hotkey_listener.set_enabled(True)
-        self.ui_construct_signal.emit()
-        self.macro_manager.stop_recording()
-        logger.info('Stopped recording')
 
-    def create_macro_item_ui(self):
+        filename = macro['filename']
+        macro_data = macro['macro']
+
         item_widget: QWidget = loadUi("ui/MacroItem.ui")
-        name_field = item_widget.findChild(QLineEdit, 'MacroNameField')
-        delete_button = item_widget.findChild(QPushButton, 'DeleteMacroButton')
-        save_button = item_widget.findChild(QPushButton, 'SaveButton')
-        hotkey_field : QWidget = item_widget.findChild(QWidget, 'MacroHotkey')
 
-        create_hotkey_widget(lambda k: print('aylmao'), None, hotkey_field.layout()) # TODO
         self.macro_items_container.layout().addWidget(item_widget)
         self.scroll_area_item.setMinimumWidth(item_widget.minimumWidth())
+
+        name_field: QLineEdit = item_widget.findChild(QLineEdit, 'MacroNameField')
+        name_field.setText(macro_data['name'])
+
+        delete_button: QPushButton = item_widget.findChild(QPushButton, 'DeleteMacroButton')
+        delete_button.clicked.connect(
+            lambda :
+            (
+                self.macro_manager.delete_macro_file(filename),
+                self.macro_items_container.layout().removeWidget(item_widget)
+            )
+        )
+
+        hotkey_container: QWidget = item_widget.findChild(QWidget, 'MacroHotkey')
+        hotkey_widget: HotkeyWidget = HotkeyWidget(
+            callback = None,
+            preload = macro_data['hotkey'],
+            parent = hotkey_container.layout()
+        )
+
+        save_button: QPushButton = item_widget.findChild(QPushButton, 'SaveButton')
+        save_button.clicked.connect(
+            lambda :(
+                self.macro_manager.update_macro_file(
+                    filename=filename,
+                    name=name_field.text(),
+                    hotkey=hotkey_widget.get_sequence_serialized()
+                )
+            )
+        )
+
+        def restore_previous():
+            mac = self.macro_manager.get_macro_file_data(filename)
+            if mac is None:
+                return
+            mac_name = mac['name']
+            mac_hotkey = mac['hotkey']
+            # hotkey_container.set_sequence(mac_hotkey)
+            name_field.setText(mac_name)
+            logger.info(f'Changes to macro {filename} discarded')
+
+        discard_button: QPushButton = item_widget.findChild(QPushButton, 'DiscardChanges')
+        discard_button.clicked.connect(restore_previous)
+
         logger.info("Added MacroItem")
 
-    def create_macro_actions_ui(self):
         actions_widget: QWidget = loadUi('ui/MacroAction.ui')
+
+        # TODO add macro actions
 
     def closeEvent(self, event):
         if self.settings.value("minimizeWhenClose", "true") == "true":

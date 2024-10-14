@@ -1,9 +1,15 @@
 from io import TextIOWrapper
 from pynput.mouse import Button, Controller as mouseController
-from pynput.keyboard import KeyCode, Controller as keyboardController
+from pynput.keyboard import KeyCode, Controller as keyboardController, Key
 import threading
 from typing import Callable
 import time
+
+def _parse_key(key: str):
+    if len(key.split('.')) > 1:
+        return getattr(Key, key.split('.')[1])
+    else:
+        return KeyCode(char=key)
 
 class Action:
     def __init__(self, runner: Callable, timestamp:int, *args, **kwargs) -> None:
@@ -17,12 +23,13 @@ class Action:
         self.__runner(*self.__args, **self.__kwargs)
 
 class MacroPlayer:
-    def __init__(self, macro_file: TextIOWrapper) -> None:
+    def __init__(self, macro_json: dict) -> None:
+        self.__data = macro_json
         self.__mouse = mouseController()
         self.__keyboard = keyboardController()
         self.__thread = threading.Thread(target=self.__worker)
         self.__stopEvent = threading.Event()
-        self.__actions = self.__parse_macro_file(macro_file)
+        self.__actions = self.__parse_macro_file(macro_json['actions'])
         self.__currentAction = 0
 
     def start(self) -> None:
@@ -34,6 +41,9 @@ class MacroPlayer:
 
     def stop(self) -> None:
         self.__stopEvent.set()
+
+    def get_data(self):
+        return self.__data
 
     def __worker(self) -> None:
         while not self.__stopEvent.is_set() and self.__currentAction < len(self.__actions):
@@ -53,18 +63,18 @@ class MacroPlayer:
             if self.__stopEvent.is_set():
                 break
 
-    def __parse_macro_file(self, file: TextIOWrapper) -> list[Action]:
-        # TODO parse preliminary data (like settings)
+    def __parse_macro_file(self, actions_string: str) -> list[Action]:
         actions: list[Action] = []
-        for _, line in enumerate(file):
-            kwrds = line.strip('\n').replace('\'', '').split(' ')
+        for line in actions_string.split('\n'):
+            kwrds = line.replace('\'', '').split(' ')
+            # print(line)
             match kwrds[0]:
                 case 'wait': # NOTE this is currently un-used, the way the events are recorded makes this redundant
                     actions.append(Action(self.__player_sleep, timestamp=int(kwrds[len(kwrds) - 1]), seconds=int(kwrds[1]), interval=int(kwrds[2]))) # NOTE maybe change this to be pulled from settings?
                 case 'keypress':
-                    actions.append(Action(self.__keyboard.press, timestamp=int(kwrds[len(kwrds) - 1]), key=KeyCode.from_char(kwrds[1])))
+                    actions.append(Action(self.__keyboard.press, timestamp=int(kwrds[len(kwrds) - 1]), key=_parse_key(kwrds[1])))
                 case 'keyrelease':
-                    actions.append(Action(self.__keyboard.release, timestamp=int(kwrds[len(kwrds) - 1]), key=KeyCode.from_char(kwrds[1])))
+                    actions.append(Action(self.__keyboard.release, timestamp=int(kwrds[len(kwrds) - 1]), key=_parse_key(kwrds[1])))
                 case 'mousemove':
                     actions.append(Action(self.__mouse.move, timestamp=int(kwrds[len(kwrds) - 1]), dx=int(kwrds[1]), dy=int(kwrds[2])))
                 case 'mousepress':

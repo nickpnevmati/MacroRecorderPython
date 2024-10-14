@@ -27,18 +27,4 @@ def deserialize_keys(serialized_keys):
         return deserialized
     except json.decoder.JSONDecodeError:
         logger.error(f"Failed to deserialize Hotkey {serialized_keys}")
-        return None
-
-# # Example usage
-# hotkeys = [Key.alt, KeyCode.from_char('a')]  # A sample list of hotkeys
-#
-# # Serialize the keys to a file
-# with open('keys.json', 'w') as f:
-#     json.dump(serialize_keys(hotkeys), f)
-#
-# # Load and deserialize the keys from the file
-# with open('keys.json', 'r') as f:
-#     loaded_keys = deserialize_keys(json.load(f))
-#
-# # Verify the deserialized keys
-# print(loaded_keys)  # Output should show the equivalent Key and KeyCode objects
+        return []

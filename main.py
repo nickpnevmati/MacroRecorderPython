@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QIcon
-from src.mainWindow import MainWindow
+from src.ui.mainWindow import MainWindow
 from src.logger import logger
 import sys
 

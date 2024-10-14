@@ -1,28 +1,58 @@
 from typing import Callable
 
-from PyQt5.QtWidgets import QLineEdit, QSizePolicy
+from PyQt5.QtWidgets import QLineEdit, QSizePolicy, QLayout
 from pynput.keyboard import Listener, Key, KeyCode, HotKey
+
+from src.backend.KeyCodeSerializer import deserialize_keys, serialize_keys
 
 _modifier_order = ["Ctrl", "Cmd", "Alt", "Option", "Shift"]
 
-class KeySequenceWidget(QLineEdit):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+class HotkeyWidget(QLineEdit):
+    def __init__(self, callback: Callable[[list | None], None] | None, preload: str, parent: QLayout):
+        super().__init__(None)
         self.setPlaceholderText("Hotkey...")
         self.setReadOnly(True)
-
-        size_policy = QSizePolicy()
-        size_policy.setHorizontalPolicy(QSizePolicy.Policy.Maximum)
-        self.setSizePolicy(size_policy)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
         self.string_sequence = []
         self.key_sequence = []
 
-        self.shortcut_changed_callback = None
+        self.shortcut_changed_callback = callback
+        self.set_sequence(preload)
+
+        parent.addWidget(self)
 
         self.listener = Listener(on_press=self.__on_press, on_release=self.__on_release)
         self.listener.start()
         self.listening = False
+
+    def set_sequence(self, keys_str: str):
+        keys = deserialize_keys(keys_str)
+        if len(keys) == 0:
+            self.clear_sequence()
+            return
+        for key in keys:
+            if isinstance(key, Key):
+                self.string_sequence.append(key.name.capitalize() if key.name else str(key))
+            if isinstance(key, KeyCode):
+                self.string_sequence.append(key.char.capitalize())
+        self.__order_sequence()
+        self.setText(' + '.join(self.string_sequence))
+        self.__execute_callback(keys)
+
+    def get_sequence_serialized(self):
+        return serialize_keys(self.key_sequence)
+
+    def clear_sequence(self):
+        self.key_sequence.clear()
+        self.string_sequence.clear()
+        self.clear()
+        self.__execute_callback([])
+
+    def mousePressEvent(self, a0):
+        if a0.button() == 1:
+            a0.accept()
+            self.listening = True
 
     def __on_press(self, key):
         if not self.listening:
@@ -42,7 +72,11 @@ class KeySequenceWidget(QLineEdit):
             self.setText(' + '.join(self.string_sequence))
 
             self.listening = False
-            self.shortcut_changed_callback(self.key_sequence)
+            self.__execute_callback(self.key_sequence)
+
+    def __execute_callback(self, seq):
+        if self.shortcut_changed_callback:
+            self.shortcut_changed_callback(seq)
 
     def __on_release(self, key):
         if not self.listening:
@@ -51,33 +85,6 @@ class KeySequenceWidget(QLineEdit):
 
         key_str = key.name.capitalize() if key.name else str(key)
         self.string_sequence.remove(key_str)
-
-    def set_sequence(self, keys: list | None):
-        if not keys:
-            self.clear_sequence()
-            return
-        for key in keys:
-            if isinstance(key, Key):
-                self.string_sequence.append(key.name.capitalize() if key.name else str(key))
-            if isinstance(key, KeyCode):
-                self.string_sequence.append(key.char.capitalize())
-        self.__order_sequence()
-        self.setText(' + '.join(self.string_sequence))
-        self.shortcut_changed_callback(keys)
-
-    def clear_sequence(self):
-        self.key_sequence.clear()
-        self.string_sequence.clear()
-        self.clear()
-        self.shortcut_changed_callback(None)
-
-    def connect_shortcut_changed_callback(self, callback: Callable[[list | None], None]):
-        self.shortcut_changed_callback = callback
-
-    def mousePressEvent(self, a0):
-        if a0.button() == 1:
-            a0.accept()
-            self.listening = True
 
     def __order_sequence(self):
         self.string_sequence = sorted(
