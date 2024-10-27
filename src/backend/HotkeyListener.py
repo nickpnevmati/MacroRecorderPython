@@ -8,9 +8,6 @@ class HotkeyListener:
     def __init__(self, keys: str, callback: Callable):
         self.listener = Listener(on_press=self.__on_press, on_release=self.__on_release)
         self.__callback = callback
-        dsk = []
-        for k in deserialize_keys(keys):
-            dsk.append(self.listener.canonical(k))
         self.hotkey = HotKey(deserialize_keys(keys), self.__callback_wrapper)
         self.__enabled = False
         self.__lock = threading.Lock()

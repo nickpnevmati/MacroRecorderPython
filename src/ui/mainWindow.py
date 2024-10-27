@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.uic import loadUi
 from src.ui import HotkeyWidget
+from src.ui.MacroItemWidget import MacroItemWidget, MacroActionWidget
 from src.ui.HotkeyWidget import HotkeyWidget
 from src.backend.KeyCodeSerializer import serialize_keys, deserialize_keys
 from src.backend.macroManager import MacroManager
@@ -100,61 +101,41 @@ class MainWindow(QMainWindow):
             return
 
         filename = macro['filename']
-        macro_data = macro['macro']
 
-        item_widget: QWidget = loadUi("ui/MacroItem.ui")
+        item_widget = MacroItemWidget(macro)
+        item_widget.clicked.connect(
+            lambda :( # LMAO it looks like the lambda is sad
+                self.create_macro_actions_ui(item_widget)
+            )
+        )
 
         self.macro_items_container.layout().addWidget(item_widget)
         self.scroll_area_item.setMinimumWidth(item_widget.minimumWidth())
 
-        name_field: QLineEdit = item_widget.findChild(QLineEdit, 'MacroNameField')
-        name_field.setText(macro_data['name'])
-
-        delete_button: QPushButton = item_widget.findChild(QPushButton, 'DeleteMacroButton')
-        delete_button.clicked.connect(
-            lambda :
-            (
+        item_widget.delete_button.clicked.connect(
+            lambda :(
                 self.macro_manager.delete_macro_file(filename),
                 self.macro_items_container.layout().removeWidget(item_widget)
             )
         )
 
-        hotkey_container: QWidget = item_widget.findChild(QWidget, 'MacroHotkey')
-        hotkey_widget: HotkeyWidget = HotkeyWidget(
-            callback = None,
-            preload = macro_data['hotkey'],
-            parent = hotkey_container.layout()
-        )
-
-        save_button: QPushButton = item_widget.findChild(QPushButton, 'SaveButton')
-        save_button.clicked.connect(
+        item_widget.save_button.clicked.connect(
             lambda :(
                 self.macro_manager.update_macro_file(
-                    filename=filename,
-                    name=name_field.text(),
-                    hotkey=hotkey_widget.get_sequence_serialized()
+                    filename    = filename,
+                    name        = item_widget.name_field.text(),
+                    hotkey      = item_widget.hotkey_widget.get_sequence_serialized()
                 )
             )
         )
 
-        def restore_previous():
-            mac = self.macro_manager.get_macro_file_data(filename)
-            if mac is None:
-                return
-            mac_name = mac['name']
-            mac_hotkey = mac['hotkey']
-            # hotkey_container.set_sequence(mac_hotkey)
-            name_field.setText(mac_name)
-            logger.info(f'Changes to macro {filename} discarded')
-
-        discard_button: QPushButton = item_widget.findChild(QPushButton, 'DiscardChanges')
-        discard_button.clicked.connect(restore_previous)
-
         logger.info("Added MacroItem")
 
-        actions_widget: QWidget = loadUi('ui/MacroAction.ui')
+    def create_macro_actions_ui(self, macro: MacroItemWidget):
+        #TODO flush current contents
+        for action_ui in macro.create_ui_actions():
+            self.macro_actions_container.layout().addWidget(action_ui)
 
-        # TODO add macro actions
 
     def closeEvent(self, event):
         if self.settings.value("minimizeWhenClose", "true") == "true":

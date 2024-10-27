@@ -8,7 +8,7 @@ from src.backend.KeyCodeSerializer import deserialize_keys, serialize_keys
 _modifier_order = ["Ctrl", "Cmd", "Alt", "Option", "Shift"]
 
 class HotkeyWidget(QLineEdit):
-    def __init__(self, callback: Callable[[list | None], None] | None, preload: str, parent: QLayout):
+    def __init__(self, on_changed_callback: Callable[[list | None], None] | None, preload: str, parent: QLayout):
         super().__init__(None)
         self.setPlaceholderText("Hotkey...")
         self.setReadOnly(True)
@@ -17,7 +17,7 @@ class HotkeyWidget(QLineEdit):
         self.string_sequence = []
         self.key_sequence = []
 
-        self.shortcut_changed_callback = callback
+        self.shortcut_changed_callback = on_changed_callback
         self.set_sequence(preload)
 
         parent.addWidget(self)
@@ -25,11 +25,12 @@ class HotkeyWidget(QLineEdit):
         self.listener = Listener(on_press=self.__on_press, on_release=self.__on_release)
         self.listener.start()
         self.listening = False
+        self.__is_set = True
 
     def set_sequence(self, keys_str: str):
+        self.clear_sequence()
         keys = deserialize_keys(keys_str)
         if len(keys) == 0:
-            self.clear_sequence()
             return
         for key in keys:
             if isinstance(key, Key):
@@ -57,6 +58,9 @@ class HotkeyWidget(QLineEdit):
     def __on_press(self, key):
         if not self.listening:
             return
+        if self.__is_set:
+            self.clear_sequence()
+            self.__is_set = False
         if isinstance(key, Key):  # For modifiers
             self.key_sequence.append(self.listener.canonical(key))
             key_str = key.name.capitalize() if key.name else str(key)
@@ -72,6 +76,7 @@ class HotkeyWidget(QLineEdit):
             self.setText(' + '.join(self.string_sequence))
 
             self.listening = False
+            self.__is_set = True
             self.__execute_callback(self.key_sequence)
 
     def __execute_callback(self, seq):
